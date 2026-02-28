@@ -1,0 +1,80 @@
+[gd_scene format=3 uid="uid://deissojf6m5dv"]
+
+[ext_resource type="Script" uid="uid://blgupf4eewbm6" path="res://Player.cs" id="1_a202f"]
+[ext_resource type="Script" uid="uid://disnqmn4xa4x1" path="res://CameraPivot.cs" id="2_a0tk4"]
+[ext_resource type="Script" uid="uid://b4q15golg8mqv" path="res://Enemy.cs" id="2_noarx"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_noarx"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_a0tk4"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_r3fl7"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_r3fl7"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_a0tk4"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_a0tk4"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_jka67"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_r3fl7"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_a0tk4"]
+
+[node name="Cena" type="Node3D" unique_id=1953985709]
+
+[node name="Player" type="CharacterBody3D" parent="." unique_id=1490052411 groups=["player"]]
+script = ExtResource("1_a202f")
+
+[node name="PlayerCollision" type="CollisionShape3D" parent="Player" unique_id=697462528]
+shape = SubResource("SphereShape3D_noarx")
+
+[node name="PlayerMesh" type="MeshInstance3D" parent="Player" unique_id=1402522205]
+mesh = SubResource("SphereMesh_a0tk4")
+surface_material_override/0 = SubResource("StandardMaterial3D_r3fl7")
+
+[node name="Sword" type="Node3D" parent="Player" unique_id=862155676]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06855941, 0.056070507, -1.1920929e-07)
+
+[node name="SwordMesh" type="MeshInstance3D" parent="Player/Sword" unique_id=736617372]
+transform = Transform3D(0.1, 0, 0, 0, 0.0996152, -0.07011405, 0, 0.008764256, 0.7969216, 0.05142659, -0.05824387, -0.89074546)
+mesh = SubResource("BoxMesh_r3fl7")
+surface_material_override/0 = SubResource("StandardMaterial3D_a0tk4")
+
+[node name="SwordAttackArea" type="Area3D" parent="Player/Sword" unique_id=733492501]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.06855941, -0.15439028, -1.203057)
+monitorable = false
+
+[node name="SwordAttackCollision" type="CollisionShape3D" parent="Player/Sword/SwordAttackArea" unique_id=950806187]
+transform = Transform3D(0.27, 0, 0, 0, 0.03757674, 0.26737237, 0, -0.26737237, 0.03757674, -0.015, 0.095, 0.157)
+shape = SubResource("CapsuleShape3D_a0tk4")
+disabled = true
+
+[node name="CameraPivot" type="Node3D" parent="Player" unique_id=172746034]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+script = ExtResource("2_a0tk4")
+
+[node name="Camera" type="Camera3D" parent="Player/CameraPivot" unique_id=776489403]
+transform = Transform3D(1, 0, 0, 0, 0.7431448, 0.6691306, 0, -0.6691306, 0.7431448, 0, 0.845, 1.32)
+
+[node name="Enemy" type="CharacterBody3D" parent="." unique_id=292171957 groups=["enemies"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4.06)
+script = ExtResource("2_noarx")
+
+[node name="EnemyMesh" type="MeshInstance3D" parent="Enemy" unique_id=1094614045]
+mesh = SubResource("BoxMesh_jka67")
+
+[node name="EnemyCollision" type="CollisionShape3D" parent="Enemy" unique_id=1164736050]
+shape = SubResource("BoxShape3D_r3fl7")
+
+[node name="EnemyAttackArea" type="Area3D" parent="Enemy" unique_id=562127437]
+monitorable = false
+
+[node name="EnemyAttackCollision" type="CollisionShape3D" parent="Enemy/EnemyAttackArea" unique_id=708677312]
+transform = Transform3D(1.16, 0, 0, 0, 1.16, 0, 0, 0, 1.16, 0, 0, 0)
+shape = SubResource("BoxShape3D_a0tk4")
+disabled = true
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=62033179]
+transform = Transform3D(1, 0, 0, 0, 0.052335974, 0.9986295, 0, -0.9986295, 0.052335974, 0, 5.822346, 0)
