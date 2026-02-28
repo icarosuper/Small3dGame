@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 
 namespace Teste;
@@ -14,25 +15,30 @@ public partial class Player : CharacterBody3D
 	
 	// Movement
 	private const float MovementMaxSpeed = 5f;
-	private const float AccelerationMultiplier = .8f;
-	private const float DecelerationMultiplier = 1.2f;
-	private const float LowStaminaVelocityMultiplier = .4f;
-	private const float DamagedVelocityMultiplier = .8f;
+	private const float LowStaminaMaxSpeed = 2f;
+	private const float DamagedMaxSpeed = 4;
+	private const float DashMaxSpeed = 12f;
+	private const float AccelerationMultiplier = 1f;
+	private const float DecelerationMultiplier = 1.5f;
+	private const float DashAccelerationMultiplier = 5f;
 	private const double LowStaminaTimerMax = 1;
-	private const double DashTimerMax = .3;
+	private const double DashTimerMax = .2;
+	private const double DashCooldownTimerMax = 1;
 	private double _lowStaminaTimer;
 	private double _dashTimer;
+	private double _dashCooldownTimer;
 	private Vector3 _dashDirection;
 	
 	// Combat
 	private const double AttackTimerMax = .5;
-	private const double AttackCooldownTimerMax = .5;
-	private const double DamagedStateTimerMax = .5;
+	private const double AttackCooldownTimerMax = .8;
+	private const double DamagedStateTimerMax = 1;
 	private bool _playerIsAttacking;
 	private double _attackTimer;
 	private bool _playerIsInAttackCooldown;
 	private double _attackCooldownTimer;
 	private double _damagedStateTimer;
+	private List<ulong> _bodiesCheckedForDamage = [];
 	
 	// Nodes
 	private StandardMaterial3D _playerMaterial;
@@ -87,7 +93,7 @@ public partial class Player : CharacterBody3D
 		switch (_state)
 		{
 			case PlayerState.Normal:
-				HandleNormalState();
+				HandleNormalState(delta);
 				break;
 			
 			case PlayerState.Damaged:
@@ -132,14 +138,24 @@ public partial class Player : CharacterBody3D
 		}
 	}
 
-	private void HandleNormalState()
+	private void HandleNormalState(double delta)
 	{
-		HandleMovement(new MovementParams());
+		HandleMovement();
+
+		if (_dashCooldownTimer > 0)
+		{
+			_dashCooldownTimer -= delta;
+			return;
+		}
+		
+		var shiftPressed = Input.IsKeyPressed(Key.Shift);
+		if (shiftPressed)
+			ChangeState(PlayerState.Dash);
 	}
 
 	private void HandleDamagedState(double delta)
 	{
-	   HandleMovement(new MovementParams{ VelocityModifier = DamagedVelocityMultiplier});
+	   HandleMovement(DamagedMaxSpeed);
 	   
 	   _damagedStateTimer -= delta;
 	   if (_damagedStateTimer <= 0)
@@ -148,7 +164,7 @@ public partial class Player : CharacterBody3D
 
 	private void HandleLowStaminaState(double delta)
 	{
-	   HandleMovement(new MovementParams { VelocityModifier = LowStaminaVelocityMultiplier});
+	   HandleMovement(LowStaminaMaxSpeed);
 	   
 	   _lowStaminaTimer -= delta;
 	   if (_lowStaminaTimer <= 0)
@@ -157,14 +173,14 @@ public partial class Player : CharacterBody3D
 
 	private void HandleDashState(double delta)
 	{
-	   HandleMovement(new MovementParams
-	   {
-		   Direction = _dashDirection
-	   });
+	   HandleDash();
 	   
 	   _dashTimer -= delta;
 	   if (_dashTimer <= 0)
+	   {
+		   _dashCooldownTimer = DashCooldownTimerMax;
 		   ChangeState(PlayerState.Normal);
+	   }
 	}
 
 	private void StartNormalState()
@@ -193,6 +209,15 @@ public partial class Player : CharacterBody3D
 		_dashTimer = DashTimerMax;
 		_dashDirection = GetMovementDirection();
 		_state = PlayerState.Dash;
+	}
+
+	private void HandleDash()
+	{
+		var velocity = Velocity;
+		velocity.X = Mathf.MoveToward(velocity.X, _dashDirection.X * DashMaxSpeed, DashAccelerationMultiplier);
+		velocity.Z = Mathf.MoveToward(velocity.Z, _dashDirection.Z * DashMaxSpeed, DashAccelerationMultiplier);
+		Velocity = velocity;
+		MoveAndSlide();
 	}
 
 	private void HandleAttack(double delta)
@@ -228,6 +253,7 @@ public partial class Player : CharacterBody3D
 	{
 		ColorSword(Colors.Red);
 		SetSwordCollisionEnabled(true);
+		_bodiesCheckedForDamage = [];
 		_attackTimer = AttackTimerMax;
 		_playerIsAttacking = true;
 	}
@@ -255,6 +281,12 @@ public partial class Player : CharacterBody3D
 	{
 		foreach (var body in _swordAttackArea.GetOverlappingBodies())
 		{
+			var id = body.GetInstanceId();
+			
+			// This prevents any entity being hit more than once in a single attack
+			if (_bodiesCheckedForDamage.Contains(id)) continue;
+			_bodiesCheckedForDamage.Add(id);
+			
 			var isEnemy = body.IsInGroup("enemies");
 			if (isEnemy)
 				body.Call("TakeDamage", Damage);
@@ -276,29 +308,16 @@ public partial class Player : CharacterBody3D
 		_playerMaterial.AlbedoColor = color;
 	}
 
-	private record MovementParams
-	{
-		public float VelocityModifier { get; init; } = 1f;
-		public float AccelerationModifier { get; init; } = 1f;
-		public Vector3? Direction { get; init; }
-	}
-
-	private void HandleMovement(MovementParams movementParams)
+	private void HandleMovement(float maxSpeed = MovementMaxSpeed)
 	{
 		var velocity = Velocity;
-		
-		var direction = movementParams.Direction ?? GetMovementDirection();
+		var direction = GetMovementDirection();
 
-		if (direction != Vector3.Zero)
+		var playerIsAccelerating = direction != Vector3.Zero;
+		if (playerIsAccelerating)
 		{
-			var newVelocityX = velocity.X + direction.X * AccelerationMultiplier;
-			var newVelocityZ = velocity.Z + direction.Z * AccelerationMultiplier;
-			
-			newVelocityX *= movementParams.VelocityModifier;
-			newVelocityZ *= movementParams.VelocityModifier;
-
-			if (Mathf.Abs(newVelocityX) < MovementMaxSpeed) velocity.X = newVelocityX;
-			if (Mathf.Abs(newVelocityZ) < MovementMaxSpeed) velocity.Z = newVelocityZ;
+			velocity.X = Mathf.MoveToward(velocity.X, direction.X * maxSpeed, AccelerationMultiplier);
+			velocity.Z = Mathf.MoveToward(velocity.Z, direction.Z * maxSpeed, AccelerationMultiplier);
 		}
 		else
 		{

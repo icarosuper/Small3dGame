@@ -24,8 +24,8 @@ public partial class Enemy : CharacterBody3D
 	// Walk
 	private const double MinWalkTimerMax = 1;
 	private const double WalkDirectionModifierTimerMax = .8;
-	private const int WalkDirectionModifierRange = 30;
-	private const float BaseMovementSpeed = 2f;
+	private const int WalkDirectionModifierRange = 45;
+	private const float BaseMovementSpeed = 3f;
 	private double _walkDirectionModifierTimer;
 	private float _walkDirectionModifier;
 	private double _minWalkTimer;

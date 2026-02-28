@@ -16,11 +16,22 @@
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_a0tk4"]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jka67"]
+
 [sub_resource type="BoxMesh" id="BoxMesh_jka67"]
+material = SubResource("StandardMaterial3D_jka67")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_r3fl7"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_a0tk4"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_i5arm"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wc5p8"]
+albedo_texture = SubResource("PlaceholderTexture2D_i5arm")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_jsk3o"]
+material = SubResource("StandardMaterial3D_wc5p8")
 
 [node name="Cena" type="Node3D" unique_id=1953985709]
 
@@ -77,4 +88,10 @@ shape = SubResource("BoxShape3D_a0tk4")
 disabled = true
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=62033179]
-transform = Transform3D(1, 0, 0, 0, 0.052335974, 0.9986295, 0, -0.9986295, 0.052335974, 0, 5.822346, 0)
+transform = Transform3D(1, 0, 0, 0, 0.052335974, 0.9986295, 0, -0.9986295, 0.052335974, 0, 19.418, 0)
+
+[node name="Floor" type="Node3D" parent="." unique_id=754107943]
+transform = Transform3D(27.67, 0, 0, 0, 27.67, 0, 0, 0, 27.67, 0, -0.595, 0)
+
+[node name="FloorMesh" type="MeshInstance3D" parent="Floor" unique_id=1474927796]
+mesh = SubResource("PlaneMesh_jsk3o")
