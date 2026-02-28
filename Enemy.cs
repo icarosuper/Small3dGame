@@ -62,16 +62,12 @@ public partial class Enemy : CharacterBody3D
 
 	public override void _PhysicsProcess(double delta)
 	{
-		if (_isInGracePeriod)
-		{
-			_gracePeriodTimer -= delta;
-			if (_gracePeriodTimer <= 0)
-			{
-				_isInGracePeriod = false;
-				ColorEnemy(Colors.White);
-			}
-		}
-		
+		HandleGracePeriod(delta);
+		HandleCurrentState(delta);
+	}
+
+	private void HandleCurrentState(double delta)
+	{
 		switch (_state)
 		{
 			case EnemyState.Walking:
@@ -117,6 +113,18 @@ public partial class Enemy : CharacterBody3D
 			
 			default:
 				throw new ArgumentOutOfRangeException(nameof(_state), _state, "_state must be in EnemyState");
+		}
+	}
+	
+	private void HandleGracePeriod(double delta)
+	{
+		if (!_isInGracePeriod) return;
+		
+		_gracePeriodTimer -= delta;
+		if (_gracePeriodTimer <= 0)
+		{
+			_isInGracePeriod = false;
+			ColorEnemy(Colors.White);
 		}
 	}
 
