@@ -70,7 +70,7 @@ script = ExtResource("2_a0tk4")
 transform = Transform3D(1, 0, 0, 0, 0.7431448, 0.6691306, 0, -0.6691306, 0.7431448, 0, 0.845, 1.32)
 
 [node name="Enemy" type="CharacterBody3D" parent="." unique_id=292171957 groups=["enemies"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4.06)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6.349326)
 script = ExtResource("2_noarx")
 
 [node name="EnemyMesh" type="MeshInstance3D" parent="Enemy" unique_id=1094614045]
@@ -83,6 +83,42 @@ shape = SubResource("BoxShape3D_r3fl7")
 monitorable = false
 
 [node name="EnemyAttackCollision" type="CollisionShape3D" parent="Enemy/EnemyAttackArea" unique_id=708677312]
+transform = Transform3D(1.16, 0, 0, 0, 1.16, 0, 0, 0, 1.16, 0, 0, 0)
+shape = SubResource("BoxShape3D_a0tk4")
+disabled = true
+
+[node name="Enemy2" type="CharacterBody3D" parent="." unique_id=1292015038 groups=["enemies"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.0216665, 0, -6.734354)
+script = ExtResource("2_noarx")
+
+[node name="EnemyMesh" type="MeshInstance3D" parent="Enemy2" unique_id=550502193]
+mesh = SubResource("BoxMesh_jka67")
+
+[node name="EnemyCollision" type="CollisionShape3D" parent="Enemy2" unique_id=287558334]
+shape = SubResource("BoxShape3D_r3fl7")
+
+[node name="EnemyAttackArea" type="Area3D" parent="Enemy2" unique_id=1198618263]
+monitorable = false
+
+[node name="EnemyAttackCollision" type="CollisionShape3D" parent="Enemy2/EnemyAttackArea" unique_id=1906463912]
+transform = Transform3D(1.16, 0, 0, 0, 1.16, 0, 0, 0, 1.16, 0, 0, 0)
+shape = SubResource("BoxShape3D_a0tk4")
+disabled = true
+
+[node name="Enemy3" type="CharacterBody3D" parent="." unique_id=994068062 groups=["enemies"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.9377565, 0, -6.9176035)
+script = ExtResource("2_noarx")
+
+[node name="EnemyMesh" type="MeshInstance3D" parent="Enemy3" unique_id=68148664]
+mesh = SubResource("BoxMesh_jka67")
+
+[node name="EnemyCollision" type="CollisionShape3D" parent="Enemy3" unique_id=119737116]
+shape = SubResource("BoxShape3D_r3fl7")
+
+[node name="EnemyAttackArea" type="Area3D" parent="Enemy3" unique_id=1082793185]
+monitorable = false
+
+[node name="EnemyAttackCollision" type="CollisionShape3D" parent="Enemy3/EnemyAttackArea" unique_id=1748795232]
 transform = Transform3D(1.16, 0, 0, 0, 1.16, 0, 0, 0, 1.16, 0, 0, 0)
 shape = SubResource("BoxShape3D_a0tk4")
 disabled = true
